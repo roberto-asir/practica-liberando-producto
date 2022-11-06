@@ -53,7 +53,7 @@ Es necesario disponer del siguiente software:
         El comando anterior mostrará algo como lo mostrado a continuación:ç
 
         ```sh
-        Python 3.8.13
+            Python 3.8.13
         ```
 
    2. Crear de virtualenv en la raíz del directorio para poder instalar las librerías necesarias:
@@ -211,23 +211,21 @@ Los requirimientos son los siguientes:
 
 - Creación de tests unitarios para el nuevo endpoint añadido, para ello será necesario modificar el [fichero de tests](./src/tests/app_test.py)
 
-- Opcionalmente creación de helm chart para desplegar la aplicación en Kubernetes, se dispone de un ejemplo de ello en el [laboratorio realizado en la clase 3](https://github.com/KeepCodingCloudDevops5/keepcoding-devops-liberando-productos/tree/main/labs/3-monitoring-autoscaling/fast-api-webapp)
+- Opcionalmente creación de helm chart para desplegar la aplicación en Kubernetes, se dispone de un ejemplo de ello en el laboratorio realizado en la clase 3
 
 - Creación de pipelines de CI/CD en cualquier plataforma (Github Actions, Jenkins, etc) que cuenten por lo menos con las siguientes fases:
 
-  - Testing: tests unitarios con cobertura. Se dispone tanto de un [ejemplo con Github Actions en el repositorio actual](./.github/workflows/test.yaml) como de un [ejemplo de ejecución](https://github.com/KeepCodingCloudDevops5/keepcoding-devops-liberando-productos-practica-final/runs/6062566772?check_suite_focus=true)
+  - Testing: tests unitarios con cobertura. Se dispone de un [ejemplo con Github Actions en el repositorio actual](./.github/workflows/test.yaml)
 
-  - Build & Push: creación de imagen docker y push de la misma a cualquier registry válido que utilice alguna estrategia de release para los tags de las vistas en clase, se recomienda GHCR ya incluido en los repositorios de Github
-
-    Se dispone tanto de un [ejemplo con Github Actions en el repositorio actual](./.github/workflows/release.yaml) como de un [ejemplo de ejecución](https://github.com/KeepCodingCloudDevops5/keepcoding-devops-liberando-productos-practica-final/runs/6062569345?check_suite_focus=true)
+  - Build & Push: creación de imagen docker y push de la misma a cualquier registry válido que utilice alguna estrategia de release para los tags de las vistas en clase, se recomienda GHCR ya incluido en los repositorios de Github. Se dispone de un [ejemplo con Github Actions en el repositorio actual](./.github/workflows/release.yaml)
 
 - Configuración de monitorización y alertas:
 
   - Configurar monitorización mediante prometheus en los nuevos endpoints añadidos, por lo menos con la siguiente configuración:
     - Contador cada vez que se pasa por el/los nuevo/s endpoint/s, tal y como se ha realizado para los endpoints implementados inicialmente
 
-  - Desplegar prometheus a través de Kubernetes mediante minikube y configurar alert-manager para por lo menos las siguientes alarmas, tal y como se [ha realizado en el laboratorio del día 3](https://github.com/KeepCodingCloudDevops5/keepcoding-devops-liberando-productos/tree/main/labs/3-monitoring-autoscaling) mediante el chart `kube-prometheus-stack`:
-    - Uso de CPU de un contenedor mayor al del límite configurado, se puede utilizar como base el ejemplo utilizado en el laboratorio 3 para mandar alarmas cuando el contenedor de la aplicación `fast-api` [consumía más del asignado mediante request](https://github.com/KeepCodingCloudDevops5/keepcoding-devops-liberando-productos/blob/main/labs/3-monitoring-autoscaling/custom_values_prometheus.yaml#L141)
+  - Desplegar prometheus a través de Kubernetes mediante minikube y configurar alert-manager para por lo menos las siguientes alarmas, tal y como se ha realizado en el laboratorio del día 3 mediante el chart `kube-prometheus-stack`:
+    - Uso de CPU de un contenedor mayor al del límite configurado, se puede utilizar como base el ejemplo utilizado en el laboratorio 3 para mandar alarmas cuando el contenedor de la aplicación `fast-api` consumía más del asignado mediante request
 
   - Las alarmas configuradas deberán tener severity high o critical
 
@@ -238,15 +236,11 @@ Los requirimientos son los siguientes:
     - Deberán enviarse tanto alarmas como recuperación de las mismas
     - Habrá una plantilla configurada para el envío de alarmas
 
-    Se ha realizado un ejemplo de ello en el laboratorio del día 3, en la [sección de configuración de alertmanager de los valores aplicados al chart](https://github.com/KeepCodingCloudDevops5/keepcoding-devops-liberando-productos/blob/main/labs/3-monitoring-autoscaling/custom_values_prometheus.yaml#L84).
-
-    Para poder comprobar si esta parte funciona se recomienda realizar una prueba de estres, como la realizada en el [laboratorio 3](https://github.com/KeepCodingCloudDevops5/keepcoding-devops-liberando-productos/tree/main/labs/3-monitoring-autoscaling#despliegue-de-aplicaci%C3%B3n-simple-fast-api) a partir del paso 8.
+    Para poder comprobar si esta parte funciona se recomienda realizar una prueba de estres, como la realizada en el laboratorio 3 a partir del paso 8.
 
   - Creación de un dashboard de Grafana, con por lo menos lo siguiente:
     - Número de llamadas a los endpoints
     - Número de veces que la aplicación ha arrancado
-
-    Se puede utilizar como base el [dashboard](https://github.com/KeepCodingCloudDevops5/keepcoding-devops-liberando-productos/blob/main/labs/3-monitoring-autoscaling/custom_dashboard.json) utilizado en el laboratorio del día 3, importandolo y realizando los cambios necesarios
 
 ## Entregables
 
