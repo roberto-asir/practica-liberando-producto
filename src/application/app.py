@@ -12,7 +12,7 @@ app = FastAPI()
 REQUESTS = Counter('server_requests_total', 'Total number of requests to this webserver')
 HEALTHCHECK_REQUESTS = Counter('healthcheck_requests_total', 'Total number of requests to healthcheck')
 MAIN_ENDPOINT_REQUESTS = Counter('main_requests_total', 'Total number of requests to main endpoint')
-
+BYE_ENDPOINT_REQUESTS = Counter('bye_requests_total', 'Total number of requests to this bye endpoint')
 class SimpleServer:
     """
     SimpleServer class define FastAPI configuration and implemented endpoints
@@ -46,3 +46,12 @@ class SimpleServer:
         # Increment counter used for register the total number of calls in the main endpoint
         MAIN_ENDPOINT_REQUESTS.inc()
         return {"msg": "Hello World"}
+
+    @app.get("/bye")
+    async def read_main():
+        """Implement bya endpoint"""
+        # Increment counter used for register the total number of calls in the webserver
+        REQUESTS.inc()
+        # Increment counter used for register the total number of calls in the main endpoint
+        BYE_ENDPOINT_REQUESTS.inc()
+        return {"msg": "Bye bye"}
