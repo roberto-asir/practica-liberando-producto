@@ -2,6 +2,8 @@ VENV 	?= venv
 PYTHON 	= $(VENV)/bin/python3
 PIP		= $(VENV)/bin/pip
 
+
+
 # Variables used to configure
 IMAGE_REGISTRY_DOCKERHUB	?= robertoasir
 IMAGE_REGISTRY_GHCR	?= ghcr.io
