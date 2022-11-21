@@ -40,7 +40,6 @@ docker-build: ## Build main image
 
 .PHONY: publish
 publish: docker-build ## Publish main image
-	echo  ${DOCKERHUB_TOKEN} | docker login --username $(IMAGE_REGISTRY_DOCKERHUB) 
 	docker push $(IMAGE)
 	docker push $(IMAGE_LATEST)
 	docker push $(IMAGE_GHCR)
