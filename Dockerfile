@@ -1,10 +1,15 @@
-FROM python:3.8.11-alpine3.14
+#FROM python:3.8.11-alpine3.14
+FROM python:3.12-rc-slim-buster
 
 WORKDIR /service/app
 ADD ./src/ /service/app/
 COPY requirements.txt /service/app/
 
-RUN apk --no-cache add curl build-base npm
+#RUN apk --no-cache add curl build-base npm
+RUN apt update && \
+    apt -y install curl npm && \
+    apt-get autoremove && \
+    apt-get clean
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
