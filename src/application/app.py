@@ -65,5 +65,5 @@ class SimpleServer:
         REQUESTS.inc()
         # Increment counter used for register the total number of calls in the main endpoint
         RISELOAD_ENDPOINT_REQUESTS.inc()
-        load_all_cores(duration_s=10, target_load=0.8)
+        load_all_cores(duration_s=60, target_load=0.8)
         return {"msg": "Load uped"}
