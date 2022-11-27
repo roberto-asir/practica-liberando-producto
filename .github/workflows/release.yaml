@@ -81,5 +81,3 @@ jobs:
         env:
           VERSION: ${{ env.VERSION }}
 
-  outputs:
-    version: ${{ env.VERSION }}
