@@ -1,6 +1,4 @@
-
-
----
+# Práctica módulo
 
 
 ## Índice:
@@ -8,7 +6,6 @@
 - [Prerequisitos](#prerequisitos)
 - [Detalles](#detalles)
 - [Pasos](#pasos)
-- [Exposicion final](#exposicion-final)
 - [Entregables](#entregables)
 
 ## Descripcion y objetivos
@@ -80,7 +77,7 @@ El endpint `/riseload` incrementa el uso de CPU en el container de la aplicació
 
 Tras varias pruebas he visto que no es posible utilizarlo de manera adecuada para el propósito de la práctica. 
 
-Sin embargo si es posible utilizarlo en la práctica y en los últimos pasos explico cómo y qué podemos conseguir con su uso.
+Sin embargo si es posible utilizarlo en la práctica y en los últimos pasos explico cómo y qué se puede conseguir con su uso.
 
 2. El versionado es con semantic-release.
 
@@ -98,6 +95,10 @@ No incluye ningún pod con la base de datos
 
 https://github.com/roberto-asir/practica-liberando-producto
 
+![Captura desde 2022-11-27 05-43-03](https://user-images.githubusercontent.com/2046110/204135362-1c954c7c-093a-437b-879e-77e416ed698d.png)
+![Captura desde 2022-11-27 12-59-33](https://user-images.githubusercontent.com/2046110/204135372-9215fd58-c453-493f-8b09-d8debeb9d90c.png)
+
+
 
 ## Pasos
 
@@ -110,38 +111,15 @@ https://github.com/KeepCodingCloudDevops6/liberando-productos-roberto
 
 Puedes clonarlo con el siguiente comando:
 
-`git clone git@github.com:KeepCodingCloudDevops6/liberando-productos-roberto.git`
-
-Luego para ejecutar los siguientes comandos debes situarte dentro del repositorio:
-
-`cd liberando-productos-roberto`
-
 ```
-    Quick setup — if you’ve done this kind of thing before
-or
-
-Get started by creating a new file or uploading an existing file. We recommend every repository include a README, LICENSE, and .gitignore.
-…or create a new repository on the command line
-
-echo "# liberndo-productos-roberto" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin git@github.com:KeepCodingCloudDevops6/liberndo-productos-roberto.git
-git push -u origin main
-
-…or push an existing repository from the command line
-
-git remote add origin git@github.com:KeepCodingCloudDevops6/liberndo-productos-roberto.git
-git branch -M main
-git push -u origin main
-
-…or import code from another repository
-
-You can initialize this repository with code from a Subversion, Mercurial, or TFS project.
+git clone git@github.com:KeepCodingCloudDevops6/liberando-productos-roberto.git
 ```
 
+**Luego para ejecutar los siguientes comandos debes situarte dentro del repositorio:**
+
+```
+cd liberando-productos-roberto
+```
 
 - Iniciar minikube (opcional)
 
@@ -156,7 +134,9 @@ minikube start --kubernetes-version='v1.21.1' \
 ```
 También se puede activar el addon de minikube `metrics-server`:
 
-`minikube addons enable metrics-server -p practica-roberto`
+```
+minikube addons enable metrics-server -p practica-roberto
+```
 
 - Descargar los repos de helm
 
@@ -174,11 +154,16 @@ helm repo update
 
     - para instalar el chart del operador:
 
-    `helm -n monitoring upgrade --install prometheus prometheus-community/kube-prometheus-stack -f monitoring/custom_values_prometheus.yaml --create-namespace --wait --version 34.1.1`
+```
+helm -n monitoring upgrade --install prometheus prometheus-community/kube-prometheus-stack -f monitoring/custom_values_prometheus.yaml --create-namespace --wait --version 34.1.1
+```
 
-    - Para instalar la aplicación:
+    - Para instalar el chart de la la aplicación:
 
-    `helm -n fast-api install fast-api-webapp --wait --create-namespace fast-api-webapp`
+``` 
+helm -n fast-api install fast-api-webapp --wait --create-namespace fast-api-webapp
+```
+
 
 - Generar los port-forward para establecer comunicación desde el navegador local
 
@@ -204,9 +189,6 @@ Para ello accede al panel de grafana en https://0.0.0.0:3000
 
 Una vez realizas el login deberás pinchar en el menú vertical de la izquierda: `+ >> Import`
 
-CAPTURACAPTURACAPTURACAPTURA
-
-
 Selecciona el archivo `dashboard-roberto.json` del directorio `monitoring` del repositorio clonado.
 
 
@@ -220,6 +202,7 @@ El dashboard tiene los siguientes paneles:
     4. Número total de reinicios del pod
     5. Número de llamadas al endpoint `health` en la última hora
     6. Número de llamadas al endpoint `riseload` en la última hora
+![Captura desde 2022-11-27 01-05-41](https://user-images.githubusercontent.com/2046110/204134913-fca6047e-58d9-44a0-96db-cd86a0d6cb58.png)
 
 - 4 Graficos temporales
     1. POD CPU: Consumo Vs Limite
@@ -227,8 +210,9 @@ El dashboard tiene los siguientes paneles:
     3. Uso de RAM vs Ram reservada
     4. Reinicios totales del pod (*)
 
-CAPTURACAPTURACAPTURACAPTURA
+![Captura desde 2022-11-27 00-52-43](https://user-images.githubusercontent.com/2046110/204134919-febb8278-6ea3-4004-b41c-4b4dae334298.png)
 
+![Captura desde 2022-11-27 01-05-59](https://user-images.githubusercontent.com/2046110/204134940-eba4de1a-d370-442e-8243-9c8a415b2012.png)
 
 > (*) Este último gráfico está puesto para poder tener referencia visual rápida de si se producen reinicios en momentos de load o de uso de RAM.
 
@@ -238,10 +222,19 @@ CAPTURACAPTURACAPTURACAPTURA
 Antes de continuar debo explicar que en ninguna de mis pruebas he podido realizar los procesos de estrés con el comportamiento realmente deseado.
 
 > El límite de CPU en ningún momento se ha rebasado en mi entorno. En el peor de los casos acababa reiniciandose el contenedor sin que las alertas salten.
->
-Para las pruebas de estrés he utilizado **dos sistemas** que utilizan el mismo principio de generar load desde el propio servidor. 
 
-Uno es la aplicación en go incluida en la práctica, el otro es una librería de python que es la que utilizo en el código para el endpoint `/riseload` aunque como mejor funciona es desde la linea de comandos.
+![Captura desde 2022-11-26 16-12-18](https://user-images.githubusercontent.com/2046110/204135564-dddbb321-490b-4218-b989-09a9197c3d91.png)
+![Captura desde 2022-11-26 17-30-23](https://user-images.githubusercontent.com/2046110/204135573-2cdc8087-d784-4f1f-ac76-2b92a1b1401f.png)
+![Captura desde 2022-11-27 00-51-35](https://user-images.githubusercontent.com/2046110/204135588-ee256569-6d5a-44dc-b566-96b029f4c7aa.png)
+![Captura desde 2022-11-27 00-52-43](https://user-images.githubusercontent.com/2046110/204135599-5788efa2-313a-4067-9cff-7042b2111058.png)
+![Captura desde 2022-11-27 04-28-52](https://user-images.githubusercontent.com/2046110/204135618-39df7353-709a-4580-bea6-ab5282332d5f.png)
+![Captura desde 2022-11-27 04-30-13](https://user-images.githubusercontent.com/2046110/204135630-9381128c-439f-43ae-8855-45e2d2654d66.png)
+
+
+Para las pruebas de estrés he utilizado **dos sistemas** que utilizan el mismo principio de generar load desde el propio servidor:
+
+1. Uno es la aplicación en go incluida en la práctica 
+2. El otro es una librería de python que es la que utilizo en el código para el endpoint `/riseload` aunque como mejor funciona es desde la linea de comandos.
 
 **Tampoco se supera siempre el límite de memoria con la aplicación.**
 
@@ -260,11 +253,13 @@ Por lo tanto he duplicado la alarma que debía de avisar en ese caso para que co
 En mis pruebas las alarmas de CPU al 80% y la de memoria si que se disparan.
 
 
-Ahora si, continúo
+Ahora si, continúo 
 
 Lo primero es acceder al pod:
 
-`kubectl exec  -it -n fast-api $(kubectl get pod -n fast-api --no-headers | cut -d' ' -f1)  -- bash`
+```bash
+kubectl exec  -it -n fast-api $(kubectl get pod -n fast-api --no-headers | cut -d' ' -f1)  -- bash
+```
 
 Una vez dentro puedes utilizar dos sistemas para generar load:
 
@@ -276,11 +271,11 @@ La idea inicial era no tener que instalar la herramienta en GO y que se pudiera 
 
 Para ejecutar la librería puedes utilizar este comando desde la consola del contenedor:
 
-```
+```bash
 python -m cpu_load_generator -d 120 -c -1 -l 0.9
 ```
 
-Este método sin embargo no termina de consumir RAM y no afecta a la alerta de memoria.
+**Este método sin embargo no termina de consumir RAM y no afecta a la alerta de memoria.**
 
 2. Aplicación en GO
 
@@ -293,9 +288,15 @@ cd NodeWrecker && go build -o extress main.go
 
 Para ejecutar la prueba de estress:
 
-`./extress -abuse-memory -threads=10 -max-duration 10000000`
+```
+./extress -abuse-memory -threads=10 -max-duration 10000000
+```
 
 Este método si que hace saltar la alerta de memoria.
+
+
+![Captura desde 2022-11-27 05-18-30](https://user-images.githubusercontent.com/2046110/204135465-52b6aebf-e292-4e62-ad5b-6c32f0241001.png)
+
 
 
 - adicional/final 
@@ -311,72 +312,29 @@ Si se accede mientras el uso de los recursos es bastante alto además de mostrar
 
 Con esta acción desescala el consumo de recursos apareciendo las alarmas con el estado `RESOLVED` y se puede ver el incremento en el contador de reinicios y en el gráfico y cómo corresponde con un pico de actividad.
 
+![Captura desde 2022-11-25 23-38-54](https://user-images.githubusercontent.com/2046110/204135548-41c7d84d-b40d-4ce4-9a71-733f13997ed1.png)
 
-
-## Exposicion final
-
-Detallo sobbre los puntos lo realizado en la práctica.
-
-
-> *- Añadir por lo menos un nuevo endpoint a los existentes....*
->
->*- Creación de tests unitarios ...*
-
-CAPTURAS
-
->*- Creación de helm chart para desplegar la aplicación en Kubernetes*
-
-He utilizado la plantilla del laboratorio 3 y le he quitado todo lo relacionado con Mongo y HPA para dejarlo lo más ceñido posible a la aplicación realizada.
-
-Se encuentra en la carpeta `fast-api-webapp/` del repositorio.
-
->*- Creación de pipelines de CI/CD en cualquier plataforma...*
->
->*- Testing: tests unitarios con cobertura*    
-
-    CAPTURA TEST GITHUB
-
->*- Build & Push: creación de imagen docker y push de la misma...*
-
-    CAPTURA BUILD Y PUSH DESDE GITHUB
-
->*- Configuración de monitorización y alertas:*
->
->- *Configurar monitorización mediante prometheus en los nuevos endpoints añadidos...*
-
-Se ha añadido en el código de la aplicación un contador para cada endpoint y para que aumente el contador global ne cada acceso a los nuevos endpoints.
-
->*- Desplegar prometheus a través de Kubernetes mediante minikube y configurar alert-manager para por lo menos las siguientes alarmas, tal y como se ha realizado en el laboratorio del día 3 mediante el chart kube-prometheus-stack:*
->
->    *- Uso de CPU de un contenedor mayor al del límite configurado, se puede utilizar como base el ejemplo utilizado en el laboratorio 3 para mandar alarmas cuando el contenedor de la aplicación fast-api consumía más del asignado mediante request*
->
->   *Las alarmas configuradas deberán tener severity high o critical*
-
-
-
-
-
-> *- Crear canal en slack <nombreAlumno>-prometheus-alarms y configurar webhook entrante para envío de alertas con alert manager*
->
-> *- Alert manager estará configurado para lo siguiente:*
->    *- Mandar un mensaje a Slack en el canal configurado en el paso anterior con las alertas con label "severity" y "critical"*
-        
-        
->*Deberán enviarse tanto alarmas como recuperación de las mismas*
->*Habrá una plantilla configurada para el envío de alarmas*
-
-> *Para poder comprobar si esta parte funciona se recomienda realizar una prueba de estres, como la realizada en el laboratorio 3 a partir del paso 8.*
-
-> *Creación de un dashboard de Grafana, con por lo menos lo siguiente:*
-> *- Número de llamadas a los endpoints*
-> *- Número de veces que la aplicación ha arrancado*
 
 
 ## Entregables
 
 Se deberá entregar mediante un repositorio realizado a partir del original lo siguiente:
 
-- Código de la aplicación y los tests modificados
-- Ficheros para CI/CD configurados y ejemplos de ejecución válidos
-- Ficheros para despliegue y configuración de prometheus de todo lo relacionado con este, así como el dashboard creado exportado a `JSON` para poder reproducirlo
-- `README.md` donde se explique como se ha abordado cada uno de los puntos requeridos en el apartado anterior, con ejemplos prácticos y guía para poder reproducir cada uno de ellos
+> - Código de la aplicación y los tests modificados
+
+El código está en la carpeta src del repositorio.
+
+> - Ficheros para CI/CD configurados y ejemplos de ejecución válidos
+
+- El código necesario para el semantic-release está en el fichero `./github/workflows/release.yaml` y en `./package.json`
+
+> - Ficheros para despliegue y configuración de prometheus de todo lo relacionado con este, así como el dashboard creado exportado a `JSON` para poder reproducirlo
+
+El dashboard se encuentra en el directorio './monitoring/' en el fichero `dashboard-roberto.json` 
+
+La configuración de prometheus y de alermanager se encuentra en `./monitoring/custom_values_prometheus.yaml` 
+
+
+> - `README.md` donde se explique como se ha abordado cada uno de los puntos requeridos en el apartado anterior, con ejemplos prácticos y guía para poder reproducir cada uno de ellos
+
+Este mismo documento.
