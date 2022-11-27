@@ -3,15 +3,28 @@ name: release-build
 on:
   workflow_run:
     workflows: [ "Test" ]
+    branches: [ main ]
     types: 
       - completed
   push:
     tags:
       - 'v*'
     
+permissions:
+  contents: write
+  packages: write
+  issues: read
+  pull-requests: read
+
+
 jobs:
-  release:
+  semantic-release:
+    if: "${{ github.event.workflow_run.conclusion == 'success' && !contains(github.event.commits[0].message, 'chore(release):') }}"
+    name: Semantic Release
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -19,9 +32,16 @@ jobs:
       - name: Unshallow
         run: git fetch --prune --unshallow
 
-      - name: Get the version to publish
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm install
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -41,7 +61,25 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Create empty semantic_release_version.txt file
+        run: touch semantic_release_version.txt
+
+      - name: Release
+        id: semantic_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release --debug
+
+      - name: Get the version
+        id: get_version
+        run: |
+          echo VERSION=$(cat semantic_release_version.txt) >> $GITHUB_ENV
+
+
       - name: Build and push Docker image
         run: make publish
         env:
-          VERSION: ${{ steps.get_version.outputs.VERSION }}
+          VERSION: ${{ env.VERSION }}
+
+  outputs:
+    version: ${{ env.VERSION }}
