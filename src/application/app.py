@@ -15,6 +15,7 @@ HEALTHCHECK_REQUESTS = Counter('healthcheck_requests_total', 'Total number of re
 MAIN_ENDPOINT_REQUESTS = Counter('main_requests_total', 'Total number of requests to main endpoint')
 BYE_ENDPOINT_REQUESTS = Counter('bye_requests_total', 'Total number of requests to bye endpoint')
 RISELOAD_ENDPOINT_REQUESTS = Counter('riseload_requests_total', 'Total number of requests to riseload endpoint')
+
 class SimpleServer:
     """
     SimpleServer class define FastAPI configuration and implemented endpoints
@@ -65,5 +66,5 @@ class SimpleServer:
         REQUESTS.inc()
         # Increment counter used for register the total number of calls in the main endpoint
         RISELOAD_ENDPOINT_REQUESTS.inc()
-        load_all_cores(duration_s=180, target_load=2)
+        load_all_cores(duration_s=10, target_load=0.8)
         return {"msg": "Load uped"}

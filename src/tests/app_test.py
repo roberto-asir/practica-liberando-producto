@@ -37,3 +37,10 @@ class TestSimpleServer:
         assert response.status_code == 200
         assert response.json() == {"msg":"Bye bye"}
 
+    @pytest.mark.asyncio
+    async def read_riseload_test(self):
+        """Tests the riseload check endpoint"""
+        response = client.get("riseload")
+
+        assert response.status_code == 200
+        assert response.json() == {"msg": "Load uped"}
