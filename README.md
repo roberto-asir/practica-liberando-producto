@@ -1,246 +1,376 @@
-# keepcoding-devops-liberando-productos-practica-final
 
-## Objetivo
 
-El objetivo es mejorar un proyecto creado previamente para ponerlo en producción, a través de la adicción de una serie de mejoras.
+---
 
-## Proyecto inicial
 
-El proyecto inicial es un servidor que realiza lo siguiente:
+## Índice:
+- [Descripcion y objetivos](#descripcion-y-objetivos)
+- [Prerequisitos](#prerequisitos)
+- [Detalles](#detalles)
+- [Pasos](#pasos)
+- [Exposicion final](#exposicion-final)
+- [Entregables](#entregables)
 
-- Utiliza [FastAPI](https://fastapi.tiangolo.com/) para levantar un servidor en el puerto `8081` e implementa inicialmente dos endpoints:
-  - `/`: Devuelve en formato `JSON` como respuesta `{"health": "ok"}` y un status code 200.
-  - `/health`: Devuelve en formato `JSON` como respuesta `{"message":"Hello World"}` y un status code 200.
+## Descripcion y objetivos
 
-- Se han implementado tests unitarios para el servidor [FastAPI](https://fastapi.tiangolo.com/)
+Los objetivos de la práctica son los siguientes:
 
-- Utiliza [prometheus-client](https://github.com/prometheus/client_python) para arrancar un servidor de métricas en el puerto `8000` y poder registrar métricas, siendo inicialmente las siguientes:
-  - `Counter('server_requests_total', 'Total number of requests to this webserver')`: Contador que se incrementará cada vez que se haga una llamada a alguno de los endpoints implementados por el servidor (inicialmente `/` y `/health`)
-  - `Counter('healthcheck_requests_total', 'Total number of requests to healthcheck')`: Contador que se incrementará cada vez que se haga una llamada al endpoint `/health`.
-  - `Counter('main_requests_total', 'Total number of requests to main endpoint')`: Contador que se incrementará cada vez que se haga una llamada al endpoint `/`.
+- Añadir por lo menos un nuevo endpoint a los existentes / y /health, un ejemplo sería /bye que devolvería {"msg": "Bye Bye"}, para ello será necesario añadirlo en el fichero src/application/app.py
 
-## Software necesario
+- Creación de tests unitarios para el nuevo endpoint añadido, para ello será necesario modificar el fichero de tests
 
-Es necesario disponer del siguiente software:
-
-- `Python` en versión `3.8.5` o superior, disponible para los diferentes sistemas operativos en la [página oficial de descargas](https://www.python.org/downloads/release/python-385/)
-
-- `virtualenv` para poder instalar las librerías necesarias de Python, se puede instalar a través del siguiente comando:
-
-    ```sh
-    pip3 install virtualenv
-    ```
-
-    En caso de estar utilizando Linux y el comando anterior diera fallos se debe ejecutar el siguiente comando:
-
-    ```sh
-    sudo apt-get update && sudo apt-get install -y python3.8-venv
-    ```
-
-- `Docker` para poder arrancar el servidor implementado a través de un contenedor Docker, es posible descargarlo a [través de su página oficial](https://docs.docker.com/get-docker/).
-
-## Ejecución de servidor
-
-### Ejecución directa con Python
-
-1. Instalación de un virtualenv, **realizarlo sólo en caso de no haberlo realizado previamente**:
-   1. Obtener la versión actual de Python instalada para crear posteriormente un virtualenv:
-
-        ```sh
-        python3 --version
-        ```
-
-        El comando anterior mostrará algo como lo mostrado a continuación:ç
-
-        ```sh
-            Python 3.8.13
-        ```
-
-   2. Crear de virtualenv en la raíz del directorio para poder instalar las librerías necesarias:
-
-       - En caso de en el comando anterior haber obtenido `Python 3.8.*`
-
-            ```sh
-            python3.8 -m venv venv
-            ```
-
-       - En caso de en el comando anterior haber obtenido `Python 3.9.*`:
-
-           ```sh
-           python3.9 -m venv venv
-           ```
-
-2. Activar el virtualenv creado en el directorio `venv` en el paso anterior:
-
-     ```sh
-     source venv/bin/activate
-     ```
-
-3. Instalar las librerías necesarias de Python, recogidas en el fichero `requirements.txt`, **sólo en caso de no haber realizado este paso previamente**. Es posible instalarlas a través del siguiente comando:
-
-    ```sh
-    pip3 install -r requirements.txt
-    ```
-
-4. Ejecución del código para arrancar el servidor:
-
-    ```sh
-    python3 src/app.py
-    ```
-
-5. La ejecución del comando anterior debería mostrar algo como lo siguiente:
-
-    ```sh
-    [2022-04-16 09:44:22 +0000] [1] [INFO] Running on http://0.0.0.0:8081 (CTRL + C to quit)
-    ```
-
-### Ejecución a través de un contenedor Docker
-
-1. Crear una imagen Docker con el código necesario para arrancar el servidor:
-
-    ```sh
-    docker build -t simple-server:0.0.1 .
-    ```
-
-2. Arrancar la imagen construida en el paso anterior mapeando los puertos utilizados por el servidor de FastAPI y el cliente de prometheus:
-
-    ```sh
-    docker run -d -p 8000:8000 -p 8081:8081 --name simple-server simple-server:0.0.1
-    ```
-
-3. Obtener los logs del contenedor creado en el paso anterior:
-
-    ```sh
-    docker logs -f simple-server
-    ```
-
-4. La ejecución del comando anterior debería mostrar algo como lo siguiente:
-
-    ```sh
-    [2022-04-16 09:44:22 +0000] [1] [INFO] Running on http://0.0.0.0:8081 (CTRL + C to quit)
-    ```
-
-## Comprobación de endpoints de servidor y métricas
-
-Una vez arrancado el servidor, utilizando cualquier de las formas expuestas en los apartados anteriores, es posible probar las funcionalidades implementadas por el servidor:
-
-- Comprobación de servidor FastAPI, a través de llamadas a los diferentes endpoints:
-
-  - Realizar una petición al endpoint `/`
-
-      ```sh
-      curl -X 'GET' \
-      'http://0.0.0.0:8081/' \
-      -H 'accept: application/json'
-      ```
-
-      Debería devolver la siguiente respuesta:
-
-      ```json
-      {"message":"Hello World"}
-      ```
-
-  - Realizar una petición al endpoint `/health`
-
-      ```sh
-      curl -X 'GET' \
-      'http://0.0.0.0:8081/health' \
-      -H 'accept: application/json' -v
-      ```
-
-      Debería devolver la siguiente respuesta.
-
-      ```json
-      {"health": "ok"}
-      ```
-
-- Comprobación de registro de métricas, si se accede a la URL `http://0.0.0.0:8000` se podrán ver todas las métricas con los valores actuales en ese momento:
-
-  - Realizar varias llamadas al endpoint `/` y ver como el contador utilizado para registrar las llamadas a ese endpoint, `main_requests_total` ha aumentado, se debería ver algo como lo mostrado a continuación:
-
-    ```sh
-    # TYPE main_requests_total counter
-    main_requests_total 4.0
-    ```
-
-  - Realizar varias llamadas al endpoint `/health` y ver como el contador utilizado para registrar las llamadas a ese endpoint, `healthcheck_requests_total` ha aumentado, se debería ver algo como lo mostrado a continuación:
-
-    ```sh
-    # TYPE healthcheck_requests_total counter
-    healthcheck_requests_total 26.0
-    ```
-
-  - También se ha credo un contador para el número total de llamadas al servidor `server_requests_total`, por lo que este valor debería ser la suma de los dos anteriores, tal y como se puede ver a continuación:
-
-    ```sh
-    # TYPE server_requests_total counter
-    server_requests_total 30.0
-    ```
-
-## Tests
-
-Se ha implementado tests unitarios para probar el servidor FastAPI, estos están disponibles en el archivo `src/tests/app_test.py`.
-
-Es posible ejecutar los tests de diferentes formas:
-
-- Ejecución de todos los tests:
-
-    ```sh
-    pytest
-    ```
-
-- Ejecución de todos los tests y mostrar cobertura:
-
-    ```sh
-    pytest --cov
-    ```
-
-- Ejecución de todos los tests y generación de report de cobertura:
-
-    ```sh
-    pytest --cov --cov-report=html
-    ```
-
-## Practica a realizar
-
-A partir del ejemplo inicial descrito en los apartados anteriores es necesario realizar una serie de mejoras:
-
-Los requirimientos son los siguientes:
-
-- Añadir por lo menos un nuevo endpoint a los existentes `/` y `/health`, un ejemplo sería `/bye` que devolvería `{"msg": "Bye Bye"}`, para ello será necesario añadirlo en el fichero [src/application/app.py](./src/application/app.py)
-
-- Creación de tests unitarios para el nuevo endpoint añadido, para ello será necesario modificar el [fichero de tests](./src/tests/app_test.py)
-
-- Opcionalmente creación de helm chart para desplegar la aplicación en Kubernetes, se dispone de un ejemplo de ello en el laboratorio realizado en la clase 3
+- (Opcional) Creación de helm chart para desplegar la aplicación en Kubernetes, se dispone de un ejemplo de ello en el laboratorio realizado en la clase 3
 
 - Creación de pipelines de CI/CD en cualquier plataforma (Github Actions, Jenkins, etc) que cuenten por lo menos con las siguientes fases:
 
-  - Testing: tests unitarios con cobertura. Se dispone de un [ejemplo con Github Actions en el repositorio actual](./.github/workflows/test.yaml)
+    - Testing: tests unitarios con cobertura. Se dispone de un ejemplo con Github Actions en el repositorio actual
 
-  - Build & Push: creación de imagen docker y push de la misma a cualquier registry válido que utilice alguna estrategia de release para los tags de las vistas en clase, se recomienda GHCR ya incluido en los repositorios de Github. Se dispone de un [ejemplo con Github Actions en el repositorio actual](./.github/workflows/release.yaml)
+    - Build & Push: creación de imagen docker y push de la misma a cualquier registry válido que utilice alguna estrategia de release para los tags de las vistas en clase, se recomienda GHCR ya incluido en los repositorios de Github. Se dispone de un ejemplo con Github Actions en el repositorio actual
 
 - Configuración de monitorización y alertas:
 
-  - Configurar monitorización mediante prometheus en los nuevos endpoints añadidos, por lo menos con la siguiente configuración:
-    - Contador cada vez que se pasa por el/los nuevo/s endpoint/s, tal y como se ha realizado para los endpoints implementados inicialmente
+    - Configurar monitorización mediante prometheus en los nuevos endpoints añadidos, por lo menos con la siguiente configuración:
+        - Contador cada vez que se pasa por el/los nuevo/s endpoint/s, tal y como se ha realizado para los endpoints implementados inicialmente
 
-  - Desplegar prometheus a través de Kubernetes mediante minikube y configurar alert-manager para por lo menos las siguientes alarmas, tal y como se ha realizado en el laboratorio del día 3 mediante el chart `kube-prometheus-stack`:
-    - Uso de CPU de un contenedor mayor al del límite configurado, se puede utilizar como base el ejemplo utilizado en el laboratorio 3 para mandar alarmas cuando el contenedor de la aplicación `fast-api` consumía más del asignado mediante request
+    - Desplegar prometheus a través de Kubernetes mediante minikube y configurar alert-manager para por lo menos las siguientes alarmas, tal y como se ha realizado en el laboratorio del día 3 mediante el chart kube-prometheus-stack:
+        - Uso de CPU de un contenedor mayor al del límite configurado, se puede utilizar como base el ejemplo utilizado en el laboratorio 3 para mandar alarmas cuando el contenedor de la aplicación fast-api consumía más del asignado mediante request
 
-  - Las alarmas configuradas deberán tener severity high o critical
+        Las alarmas configuradas deberán tener severity high o critical
 
-  - Crear canal en slack `<nombreAlumno>-prometheus-alarms` y configurar webhook entrante para envío de alertas con alert manager
+    - Crear canal en slack <nombreAlumno>-prometheus-alarms y configurar webhook entrante para envío de alertas con alert manager
 
-  - Alert manager estará configurado para lo siguiente:
-    - Mandar un mensaje a Slack en el canal configurado en el paso anterior con las alertas con label "severity" y "critical"
-    - Deberán enviarse tanto alarmas como recuperación de las mismas
-    - Habrá una plantilla configurada para el envío de alarmas
+    - Alert manager estará configurado para lo siguiente:
+        - Mandar un mensaje a Slack en el canal configurado en el paso anterior con las alertas con label "severity" y "critical"
+        
+        
+        Deberán enviarse tanto alarmas como recuperación de las mismas
+        Habrá una plantilla configurada para el envío de alarmas
 
-    Para poder comprobar si esta parte funciona se recomienda realizar una prueba de estres, como la realizada en el laboratorio 3 a partir del paso 8.
+        Para poder comprobar si esta parte funciona se recomienda realizar una prueba de estres, como la realizada en el laboratorio 3 a partir del paso 8.
 
-  - Creación de un dashboard de Grafana, con por lo menos lo siguiente:
-    - Número de llamadas a los endpoints
-    - Número de veces que la aplicación ha arrancado
+        Creación de un dashboard de Grafana, con por lo menos lo siguiente:
+        - Número de llamadas a los endpoints
+        - Número de veces que la aplicación ha arrancado
+
+
+## Prerequisitos
+
+Es necesario disponer del siguiente software:
+
+- Python 3.8.x o superior y pip3
+
+- Docker 
+
+- minikube (en caso de querer realizarlo en el equipo local)
+
+- kubectl
+
+- helm
+
+## Detalles
+
+1. En la aplicación he añadido dos endpoints:
+
+- `/bye`
+- `/riseload`
+
+También he realizado sus correspondientes test.
+
+El endpint `/riseload` incrementa el uso de CPU en el container de la aplicación.
+
+Tras varias pruebas he visto que no es posible utilizarlo de manera adecuada para el propósito de la práctica. 
+
+Sin embargo si es posible utilizarlo en la práctica y en los últimos pasos explico cómo y qué podemos conseguir con su uso.
+
+2. El versionado es con semantic-release.
+
+La generación de las nuevas imágenes se hace realizando el push con un tag que comience con `v`
+
+Se utiliza Github para el CI
+
+3. El deployment tiene *un único pod*. 
+
+No incluye ningún pod con la base de datos
+
+4. El deployment **no contempla ningún escenario de autoescalado**
+
+5. Ante la posibilidad del problema de límites de github actions el desarrollo lo he realizado en un repositorio propio público y es de ahí de donde son las capturas de la parte CI:
+
+https://github.com/roberto-asir/practica-liberando-producto
+
+
+## Pasos
+
+Para comprobar la práctica puedes seguir estos pasos:
+
+- Clonar el repo
+
+Los archivos necesarios para cumplimentar los requisitos y objetivos de la práctiva están en este repositorio: 
+https://github.com/KeepCodingCloudDevops6/liberando-productos-roberto
+
+Puedes clonarlo con el siguiente comando:
+
+`git clone git@github.com:KeepCodingCloudDevops6/liberando-productos-roberto.git`
+
+Luego para ejecutar los siguientes comandos debes situarte dentro del repositorio:
+
+`cd liberando-productos-roberto`
+
+```
+    Quick setup — if you’ve done this kind of thing before
+or
+
+Get started by creating a new file or uploading an existing file. We recommend every repository include a README, LICENSE, and .gitignore.
+…or create a new repository on the command line
+
+echo "# liberndo-productos-roberto" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin git@github.com:KeepCodingCloudDevops6/liberndo-productos-roberto.git
+git push -u origin main
+
+…or push an existing repository from the command line
+
+git remote add origin git@github.com:KeepCodingCloudDevops6/liberndo-productos-roberto.git
+git branch -M main
+git push -u origin main
+
+…or import code from another repository
+
+You can initialize this repository with code from a Subversion, Mercurial, or TFS project.
+```
+
+
+- Iniciar minikube (opcional)
+
+Durante el desarrollo he utilizado `minikube` como entorno para el cluster de kubernetes.
+
+Si deseas utilizar también *minikube* deberás lebantar un profilecon el siguiente comando:
+
+```bash
+minikube start --kubernetes-version='v1.21.1' \
+    --memory=4096 \
+    -p practica-roberto
+```
+También se puede activar el addon de minikube `metrics-server`:
+
+`minikube addons enable metrics-server -p practica-roberto`
+
+- Descargar los repos de helm
+
+Para la realización de la práctica utilizaremos un chart de helm del operador de prometheus.
+
+Para instalar el repo
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+```
+
+
+- Instalar dos charts de helm
+
+    - para instalar el chart del operador:
+
+    `helm -n monitoring upgrade --install prometheus prometheus-community/kube-prometheus-stack -f monitoring/custom_values_prometheus.yaml --create-namespace --wait --version 34.1.1`
+
+    - Para instalar la aplicación:
+
+    `helm -n fast-api install fast-api-webapp --wait --create-namespace fast-api-webapp`
+
+- Generar los port-forward para establecer comunicación desde el navegador local
+
+Con esto tenemos las aplicaciones instaladas pero hay que proporcionar acceso a ellas a nuestro navegador.
+
+Lo conseguimos con port-forwarding, este paso es conveniente realizarlo en una pestaña a parte para que el output de estos comandos no aparezca en la pestaña de trabajo:
+```
+kubectl -n fast-api port-forward svc/fast-api-webapp 8081:8081 & 
+kubectl -n monitoring port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 &
+kubectl -n monitoring port-forward svc/prometheus-grafana 3000:http-web &
+```
+
+
+> Estos pasos están pensados para un entorno local con *minikube*, si tu entorno emplea otro proveedor deberás tener en cuenta sus necesidades concretas para el acceso a las direcciones y puertos necesarios.
+
+- instalar el dashboard
+
+Ahora debemos instalar el dashboard.
+
+Para ello accede al panel de grafana en https://0.0.0.0:3000
+
+> El usuario es `admin` y la contraseña `prom-operator`
+
+Una vez realizas el login deberás pinchar en el menú vertical de la izquierda: `+ >> Import`
+
+CAPTURACAPTURACAPTURACAPTURA
+
+
+Selecciona el archivo `dashboard-roberto.json` del directorio `monitoring` del repositorio clonado.
+
+
+
+El dashboard tiene los siguientes paneles:
+
+- 6 contadores
+    1. Número de llamadas al servidor en la última hora
+    2. Número de llamadas al endpoint `/` en la última hora
+    3. Número de llamadas al endpoint `bye` en la última hora
+    4. Número total de reinicios del pod
+    5. Número de llamadas al endpoint `health` en la última hora
+    6. Número de llamadas al endpoint `riseload` en la última hora
+
+- 4 Graficos temporales
+    1. POD CPU: Consumo Vs Limite
+    2. POD CPU: % usado
+    3. Uso de RAM vs Ram reservada
+    4. Reinicios totales del pod (*)
+
+CAPTURACAPTURACAPTURACAPTURA
+
+
+> (*) Este último gráfico está puesto para poder tener referencia visual rápida de si se producen reinicios en momentos de load o de uso de RAM.
+
+
+- preparar y ejecutar el entorno de estress
+
+Antes de continuar debo explicar que en ninguna de mis pruebas he podido realizar los procesos de estrés con el comportamiento realmente deseado.
+
+> El límite de CPU en ningún momento se ha rebasado en mi entorno. En el peor de los casos acababa reiniciandose el contenedor sin que las alertas salten.
+>
+Para las pruebas de estrés he utilizado **dos sistemas** que utilizan el mismo principio de generar load desde el propio servidor. 
+
+Uno es la aplicación en go incluida en la práctica, el otro es una librería de python que es la que utilizo en el código para el endpoint `/riseload` aunque como mejor funciona es desde la linea de comandos.
+
+**Tampoco se supera siempre el límite de memoria con la aplicación.**
+
+Esto me ha hecho dar muchas vueltas, realizar muchas pruebas y estar estancado hasta el punto de consultarte directamente.
+
+> He generado imágenes con distinta base (con distinto sistema operativo) para descartar que fuera algo relacionado con la imagen base
+
+Igual depende de mi entorno de ejecución o igual de mi código. 
+ 
+A otros compañeros *les han funcionado expresiones de prometheus que en mi entorno no han funcinando*, por ejemplo.
+ 
+Por ese motivo, porque no superaba el límite de CPU en ningún caso, no he podido comprobar el funcionamiento deseado en la alarma que avisa al superar el límite de CPU que está programada e incluida en la práctica entregada.
+ 
+Por lo tanto he duplicado la alarma que debía de avisar en ese caso para que con el mismo comando pero cambiando el límite de la alarma avise al 80% de uso de CPU en el pod y poder así comprobar que la alarma está correctamente planteada y funciona.
+ 
+En mis pruebas las alarmas de CPU al 80% y la de memoria si que se disparan.
+
+
+Ahora si, continúo
+
+Lo primero es acceder al pod:
+
+`kubectl exec  -it -n fast-api $(kubectl get pod -n fast-api --no-headers | cut -d' ' -f1)  -- bash`
+
+Una vez dentro puedes utilizar dos sistemas para generar load:
+
+1. Librería de python
+
+Es la librería que se emplea en el endpoint `/riseload` 
+
+La idea inicial era no tener que instalar la herramienta en GO y que se pudiera ejecutar desde el navegador pero desde el código no termina de funcionar igual de bien que desde la linea de comandos.
+
+Para ejecutar la librería puedes utilizar este comando desde la consola del contenedor:
+
+```
+python -m cpu_load_generator -d 120 -c -1 -l 0.9
+```
+
+Este método sin embargo no termina de consumir RAM y no afecta a la alerta de memoria.
+
+2. Aplicación en GO
+
+Ejecuta los siguientes comandos para preparar la aplicación:
+```
+apt install -y git golang && 
+git clone https://github.com/jaeg/NodeWrecker.git && 
+cd NodeWrecker && go build -o extress main.go
+```
+
+Para ejecutar la prueba de estress:
+
+`./extress -abuse-memory -threads=10 -max-duration 10000000`
+
+Este método si que hace saltar la alerta de memoria.
+
+
+- adicional/final 
+
+Como comentaba en el punto anterior *la aplicación tiene incluido un endpoint que genera un incremento de load*.
+
+Si bien esta herramienta no ha terminado de funcionar del modo deseado para realizar la práctica con ella únicamente, si que nos sirve para hacer una última prueba en el laboratorio a modo de cierre del mismo.
+
+
+Una vez se ha revisado el funcionamiento del panel y que salta alguna de las alarmas se puede realizar el descenso de uso de recursos aprovechando el endpoint `/riseload`
+
+Si se accede mientras el uso de los recursos es bastante alto además de mostrarse en el dashboard lo más probable es que se reinicie el pod.
+
+Con esta acción desescala el consumo de recursos apareciendo las alarmas con el estado `RESOLVED` y se puede ver el incremento en el contador de reinicios y en el gráfico y cómo corresponde con un pico de actividad.
+
+
+
+## Exposicion final
+
+Detallo sobbre los puntos lo realizado en la práctica.
+
+
+> *- Añadir por lo menos un nuevo endpoint a los existentes....*
+>
+>*- Creación de tests unitarios ...*
+
+CAPTURAS
+
+>*- Creación de helm chart para desplegar la aplicación en Kubernetes*
+
+He utilizado la plantilla del laboratorio 3 y le he quitado todo lo relacionado con Mongo y HPA para dejarlo lo más ceñido posible a la aplicación realizada.
+
+Se encuentra en la carpeta `fast-api-webapp/` del repositorio.
+
+>*- Creación de pipelines de CI/CD en cualquier plataforma...*
+>
+>*- Testing: tests unitarios con cobertura*    
+
+    CAPTURA TEST GITHUB
+
+>*- Build & Push: creación de imagen docker y push de la misma...*
+
+    CAPTURA BUILD Y PUSH DESDE GITHUB
+
+>*- Configuración de monitorización y alertas:*
+>
+>- *Configurar monitorización mediante prometheus en los nuevos endpoints añadidos...*
+
+Se ha añadido en el código de la aplicación un contador para cada endpoint y para que aumente el contador global ne cada acceso a los nuevos endpoints.
+
+>*- Desplegar prometheus a través de Kubernetes mediante minikube y configurar alert-manager para por lo menos las siguientes alarmas, tal y como se ha realizado en el laboratorio del día 3 mediante el chart kube-prometheus-stack:*
+>
+>    *- Uso de CPU de un contenedor mayor al del límite configurado, se puede utilizar como base el ejemplo utilizado en el laboratorio 3 para mandar alarmas cuando el contenedor de la aplicación fast-api consumía más del asignado mediante request*
+>
+>   *Las alarmas configuradas deberán tener severity high o critical*
+
+
+
+
+
+> *- Crear canal en slack <nombreAlumno>-prometheus-alarms y configurar webhook entrante para envío de alertas con alert manager*
+>
+> *- Alert manager estará configurado para lo siguiente:*
+>    *- Mandar un mensaje a Slack en el canal configurado en el paso anterior con las alertas con label "severity" y "critical"*
+        
+        
+>*Deberán enviarse tanto alarmas como recuperación de las mismas*
+>*Habrá una plantilla configurada para el envío de alarmas*
+
+> *Para poder comprobar si esta parte funciona se recomienda realizar una prueba de estres, como la realizada en el laboratorio 3 a partir del paso 8.*
+
+> *Creación de un dashboard de Grafana, con por lo menos lo siguiente:*
+> *- Número de llamadas a los endpoints*
+> *- Número de veces que la aplicación ha arrancado*
+
 
 ## Entregables
 
