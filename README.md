@@ -98,6 +98,11 @@ https://github.com/roberto-asir/practica-liberando-producto
 ![Captura desde 2022-11-27 05-43-03](https://user-images.githubusercontent.com/2046110/204135362-1c954c7c-093a-437b-879e-77e416ed698d.png)
 ![Captura desde 2022-11-27 12-59-33](https://user-images.githubusercontent.com/2046110/204135372-9215fd58-c453-493f-8b09-d8debeb9d90c.png)
 
+6. El canal de slack para la gestión de las alarmas, que he compartidocontigo y al que deberías de tener acceso es:
+
+https://liberando-test.slack.com/archives/C04A900SKJA
+
+![Captura desde 2022-11-27 17-12-09](https://user-images.githubusercontent.com/2046110/204145306-d76b00f2-9db1-433c-9003-ef5d7c22bb02.png)
 
 
 ## Pasos
