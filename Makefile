@@ -7,8 +7,8 @@ PIP		= $(VENV)/bin/pip
 # Variables used to configure
 IMAGE_REGISTRY_DOCKERHUB	?= robertoasir
 IMAGE_REGISTRY_GHCR	?= ghcr.io
-IMAGE_REPO		= roberto-asir
-IMAGE_NAME		?= liberando-productos-practica-final
+IMAGE_REPO		= keepcodingclouddevops6
+IMAGE_NAME		?= liberando-productos-roberto
 VERSION			?= develop
 
 # Variables used to configure docker images registries to build and push
