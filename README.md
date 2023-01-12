@@ -112,12 +112,12 @@ Para comprobar la práctica puedes seguir estos pasos:
 - Clonar el repo
 
 Los archivos necesarios para cumplimentar los requisitos y objetivos de la práctiva están en este repositorio: 
-https://github.com/KeepCodingCloudDevops6/liberando-productos-roberto
+https://github.com/KeepCodingCloudDevops6/practica-liberando-producto
 
 Puedes clonarlo con el siguiente comando:
 
 ```
-git clone git@github.com:KeepCodingCloudDevops6/liberando-productos-roberto.git
+git clone git@github.com:KeepCodingCloudDevops6/practica-liberando-producto.git
 ```
 
 **Luego para ejecutar los siguientes comandos debes situarte dentro del repositorio:**
